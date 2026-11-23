@@ -1,32 +1,29 @@
 const { test, expect } = require('@playwright/test');
+const { LoginPage } = require('../pages/LoginPage');
 
-test('Negatif 1: Login gagal jika password salah', async ({ page }) => {
-  await page.goto('https://www.saucedemo.com/');
-  await page.fill('#user-name', 'standard_user');
-  await page.fill('#password', 'password_salah_123');
-  await page.click('#login-button');
+test.describe('Skenario Login Negatif', () => {
+  let loginPage;
 
-  const errorBox = page.locator('[data-test="error"]');
-  await expect(errorBox).toBeVisible();
-  await expect(errorBox).toContainText('Username and password do not match');
-});
+  test.beforeEach(async ({ page }) => {
+    loginPage = new LoginPage(page);
+    await loginPage.goto();
+  });
 
-test('Negatif 2: Login gagal jika username dan password kosong', async ({ page }) => {
-  await page.goto('https://www.saucedemo.com/');
-  await page.click('#login-button');
+  test('Negatif 1: Login gagal jika password salah', async () => {
+    await loginPage.login('standard_user', 'password_salah_123');
+    await expect(loginPage.errorMessage).toBeVisible();
+    await expect(loginPage.errorMessage).toContainText('Username and password do not match');
+  });
 
-  const errorBox = page.locator('[data-test="error"]');
-  await expect(errorBox).toBeVisible();
-  await expect(errorBox).toContainText('Username is required');
-});
+  test('Negatif 2: Login gagal jika username dan password kosong', async () => {
+    await loginPage.login('', '');
+    await expect(loginPage.errorMessage).toBeVisible();
+    await expect(loginPage.errorMessage).toContainText('Username is required');
+  });
 
-test('Negatif 3: Login gagal menggunakan akun yang terkunci (locked_out_user)', async ({ page }) => {
-  await page.goto('https://www.saucedemo.com/');
-  await page.fill('#user-name', 'locked_out_user');
-  await page.fill('#password', 'secret_sauce');
-  await page.click('#login-button');
-
-  const errorBox = page.locator('[data-test="error"]');
-  await expect(errorBox).toBeVisible();
-  await expect(errorBox).toContainText('Sorry, this user has been locked out');
+  test('Negatif 3: Login gagal menggunakan akun yang terkunci', async () => {
+    await loginPage.login('locked_out_user', 'secret_sauce');
+    await expect(loginPage.errorMessage).toBeVisible();
+    await expect(loginPage.errorMessage).toContainText('Sorry, this user has been locked out');
+  });
 });

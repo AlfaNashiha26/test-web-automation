@@ -1,27 +1,24 @@
 const { test, expect } = require('@playwright/test');
+const { LoginPage } = require('../pages/LoginPage');
+const { CheckoutPage } = require('../pages/CheckoutPage');
 
 test('E2E: Pilih produk hingga selesai checkout', async ({ page }) => {
-  // 1. Login ke aplikasi
-  await page.goto('https://www.saucedemo.com/');
-  await page.fill('#user-name', 'standard_user');
-  await page.fill('#password', 'secret_sauce');
-  await page.click('#login-button');
+  const loginPage = new LoginPage(page);
+  const checkoutPage = new CheckoutPage(page);
 
-  // 2. Masukkan barang ke keranjang
-  await page.click('#add-to-cart-sauce-labs-backpack');
-  await expect(page.locator('.shopping_cart_badge')).toHaveText('1');
+  // 1. Login
+  await loginPage.goto();
+  await loginPage.login('standard_user', 'secret_sauce');
 
-  // 3. Masuk ke keranjang dan mulai checkout
-  await page.click('.shopping_cart_link');
-  await page.click('#checkout');
+  // 2. Tambah barang ke keranjang & cek badge
+  await checkoutPage.addBackpackToCart();
+  await expect(checkoutPage.cartBadge).toHaveText('1');
 
-  // 4. Isi data pengiriman
-  await page.fill('#first-name', 'Alfa');
-  await page.fill('#last-name', 'Nashiha');
-  await page.fill('#postal-code', '10110');
-  await page.click('#continue');
+  // 3. Checkout & isi data pengiriman
+  await checkoutPage.goToCheckout();
+  await checkoutPage.fillShippingInfo('Alfa', 'Nashiha', '10110');
 
-  // 5. Konfirmasi dan verifikasi pesanan selesai
-  await page.click('#finish');
-  await expect(page.locator('.complete-header')).toHaveText('Thank you for your order!');
+  // 4. Selesaikan pesanan & verifikasi
+  await checkoutPage.finishOrder();
+  await expect(checkoutPage.completeHeader).toHaveText('Thank you for your order!');
 });
