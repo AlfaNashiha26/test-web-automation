@@ -1,0 +1,30 @@
+[
+  {
+    "testId": "TC-NEG-01",
+    "scenario": "Login gagal jika password salah",
+    "username": "standard_user",
+    "password": "password_salah_123",
+    "expectedError": "Username and password do not match"
+  },
+  {
+    "testId": "TC-NEG-02",
+    "scenario": "Login gagal jika username dan password kosong",
+    "username": "",
+    "password": "",
+    "expectedError": "Username is required"
+  },
+  {
+    "testId": "TC-NEG-03",
+    "scenario": "Login gagal menggunakan akun yang terkunci",
+    "username": "locked_out_user",
+    "password": "secret_sauce",
+    "expectedError": "Sorry, this user has been locked out"
+  },
+  {
+    "testId": "TC-NEG-04",
+    "scenario": "Login gagal jika password kosong",
+    "username": "standard_user",
+    "password": "",
+    "expectedError": "Password is required"
+  }
+]
